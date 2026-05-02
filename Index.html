@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FocoLiso</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg: #F0F5FB;
+            --surface: #FFFFFF;
+            --surface-2: #E8F0FA;
+            --blue-deep: #1A4B8C;
+            --blue-mid: #2E6FD8;
+            --blue-light: #7AAEE8;
+            --blue-pale: #C8DCFA;
+            --text: #1A2B42;
+            --text-muted: #6B87A8;
+            --border: #D0E0F5;
+            --success: #3A9E7E;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            -webkit-font-smoothing: antialiased;
+            overflow: hidden;
+        }
+
+        body::before { content: ''; position: fixed; top: -20vh; right: -10vw; width: 60vw; height: 60vw; border-radius: 50%; background: radial-gradient(circle, rgba(46,111,216,0.10) 0%, rgba(46,111,216,0) 70%); pointer-events: none; z-index: 0; }
+        body::after { content: ''; position: fixed; bottom: -15vh; left: -10vw; width: 50vw; height: 50vw; border-radius: 50%; background: radial-gradient(circle, rgba(122,174,232,0.13) 0%, rgba(122,174,232,0) 70%); pointer-events: none; z-index: 0; }
+
+        .app-container { width: 92%; max-width: 540px; position: relative; z-index: 1; }
+        .screen { display: none; flex-direction: column; width: 100%; animation: fadeUp 0.45s cubic-bezier(0.22,0.61,0.36,1) both; }
+        .screen.active { display: flex; }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card { background: var(--surface); border-radius: 20px; padding: 2.5rem; box-shadow: 0 2px 24px rgba(26,75,140,0.07), 0 1px 4px rgba(26,75,140,0.05); border: 1px solid var(--border); }
+        .logo { font-family: 'DM Serif Display', serif; font-size: 2.2rem; letter-spacing: -1px; color: var(--blue-deep); margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.6rem; }
+        .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--blue-mid); display: inline-block; flex-shrink: 0; }
+        .tagline { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 2.2rem; letter-spacing: 0.02em; }
+
+        .btn { display: flex; align-items: center; justify-content: center; gap: 0.6rem; width: 100%; padding: 1rem 1.5rem; font-size: 0.95rem; font-family: 'DM Sans', sans-serif; font-weight: 500; border-radius: 12px; cursor: pointer; transition: all 0.18s ease; border: none; }
+        .btn-primary { background: var(--blue-mid); color: #fff; box-shadow: 0 2px 12px rgba(46,111,216,0.28); }
+        .btn-primary:hover { background: var(--blue-deep); box-shadow: 0 4px 18px rgba(46,111,216,0.35); transform: translateY(-1px); }
+        .btn-secondary { background: var(--surface-2); color: var(--blue-deep); border: 1px solid var(--border); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+
+        .label { font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); margin-bottom: 0.7rem; }
+        #screen-login .card { text-align: left; }
+        .google-icon { width: 18px; height: 18px; }
+
+        .mic-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
+        .mic-pill { display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; font-weight: 500; color: var(--text-muted); background: var(--surface-2); border: 1px solid var(--border); border-radius: 20px; padding: 0.35rem 0.9rem; cursor: pointer; transition: all 0.18s; }
+        .mic-pill.active { background: #FEE9E9; border-color: #E07070; color: #C0392B; }
+        .mic-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+        .mic-pill.active .mic-dot { animation: pulse 1s infinite; }
+
+        textarea { width: 100%; background: var(--bg); border: 1.5px solid var(--border); border-radius: 14px; padding: 1.2rem 1.3rem; font-size: 1rem; font-family: 'DM Sans', sans-serif; color: var(--text); resize: none; min-height: 200px; line-height: 1.65; margin-bottom: 1.2rem; }
+        textarea:focus { outline: none; border-color: var(--blue-light); background: #fff; }
+
+        .progress-bar-wrap { height: 3px; background: var(--border); border-radius: 99px; margin-bottom: 2.2rem; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--blue-light), var(--blue-mid)); border-radius: 99px; transition: width 0.5s ease; }
+        #task-display { font-family: 'DM Serif Display', serif; font-size: 1.7rem; line-height: 1.45; color: var(--text); margin-bottom: 2.5rem; min-height: 120px; }
+        .task-counter { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 2rem; text-align: right; }
+        .focus-actions { display: flex; gap: 0.8rem; }
+        .focus-actions .btn-primary { flex: 1; }
+
+        .pause-card { text-align: center; }
+        .pause-label { font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue-light); margin-bottom: 1rem; }
+        .timer-display { font-family: 'DM Serif Display', serif; font-size: 5rem; letter-spacing: -3px; color: var(--blue-deep); margin-bottom: 0.5rem; line-height: 1; }
+        .timer-sub { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 2.5rem; }
+
+        .footer-sponsor { position: fixed; bottom: 1.5rem; left: 0; width: 100%; text-align: center; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-muted); opacity: 0.45; z-index: 0; }
+        .divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <section id="screen-login" class="screen active">
+            <div class="card">
+                <div class="logo"><span class="logo-dot"></span>FocoLiso</div>
+                <p class="tagline">Clareza mental, um passo de cada vez.</p>
+                <button class="btn btn-primary" id="btn-login">
+                    <svg class="google-icon" viewBox="0 0 24 24" fill="none">
+                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                        <path d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.83z" fill="#FBBC05"/>
+                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                    </svg>
+                    Entrar com Google
+                </button>
+            </div>
+        </section>
+
+        <section id="screen-entry" class="screen">
+            <div class="card">
+                <div class="logo"><span class="logo-dot"></span>FocoLiso</div>
+                <p class="tagline">O que está ocupando sua cabeça agora?</p>
+                <div class="mic-row">
+                    <span class="label">Brain Dump</span>
+                    <button class="mic-pill" id="btn-mic">
+                        <span class="mic-dot"></span>
+                        <span id="mic-label">Microfone</span>
+                    </button>
+                </div>
+                <textarea id="brain-dump-input" placeholder="Escreva tudo que precisa fazer, sem filtro..."></textarea>
+                <button class="btn btn-primary" id="btn-organize">Organizar meu Foco</button>
+            </div>
+        </section>
+
+        <section id="screen-focus" class="screen">
+            <div class="card">
+                <div class="progress-bar-wrap">
+                    <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+                </div>
+                <p class="label">Próximo passo</p>
+                <div id="task-display"></div>
+                <div class="task-counter" id="task-counter"></div>
+                <div class="focus-actions">
+                    <button class="btn btn-primary" id="btn-done">✓ Feito</button>
+                    <button class="btn btn-secondary" id="btn-pause-go" style="width:auto; padding: 1rem 1.3rem;">Pausa</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="screen-pause" class="screen">
+            <div class="card pause-card">
+                <p class="pause-label">Pausa · Respire</p>
+                <div class="timer-display" id="timer-text">05:00</div>
+                <p class="timer-sub">Você voltará em breve</p>
+                <button class="btn btn-primary" id="btn-resume">Voltar ao Foco</button>
+                <div class="divider"></div>
+                <p style="font-size:0.75rem; color:var(--text-muted);">Momento de descanso patrocinado por <strong>[Sponsor]</strong></p>
+            </div>
+        </section>
+    </div>
+
+    <p class="footer-sponsor">FocoLiso · Foco com leveza</p>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB3m1GoSRYutOrGbb1ZE-DF3DL7hd79zbY",
+            authDomain: "fluxoliso-23f07.firebaseapp.com",
+            projectId: "fluxoliso-23f07",
+            storageBucket: "fluxoliso-23f07.firebasestorage.app",
+            messagingSenderId: "977167752673",
+            appId: "1:977167752673:web:f5e6530008b15915e1c6a0",
+            measurementId: "G-FP2Q67F2DY"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        const GEMINI_API_KEY = "AIzaSyBxGnqK47jve2TCQK63U62rOVOicpb0f4Y";
+        const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+        let tasks = [];
+        let currentTaskIndex = 0;
+        let timerSeconds = 300;
+        let timerInterval;
+
+        const btnLogin     = document.getElementById('btn-login');
+        const btnOrganize  = document.getElementById('btn-organize');
+        const btnMic       = document.getElementById('btn-mic');
+        const micLabel     = document.getElementById('mic-label');
+        const btnDone      = document.getElementById('btn-done');
+        const btnPauseGo   = document.getElementById('btn-pause-go');
+        const btnResume    = document.getElementById('btn-resume');
+        const inputArea    = document.getElementById('brain-dump-input');
+        const taskDisplay  = document.getElementById('task-display');
+        const timerText    = document.getElementById('timer-text');
+        const progressFill = document.getElementById('progress-fill');
+        const taskCounter  = document.getElementById('task-counter');
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        // --- SISTEMA DE LOGIN PARA MOBILE ---
+        btnLogin.onclick = () => {
+            btnLogin.innerHTML = 'Carregando...';
+            btnLogin.disabled = true;
+            signInWithRedirect(auth, provider);
+        };
+
+        getRedirectResult(auth).then((result) => {
+            if (result) showScreen('screen-entry');
+        }).catch((error) => {
+            console.error("Erro no login:", error);
+            btnLogin.innerHTML = 'Entrar com Google';
+            btnLogin.disabled = false;
+        });
+
+        onAuthStateChanged(auth, (user) => {
+            showScreen(user ? 'screen-entry' : 'screen-login');
+        });
+
+        // --- SISTEMA DE MICROFONE ---
+        const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (Recognition) {
+            const rec = new Recognition();
+            rec.lang = 'pt-BR';
+            btnMic.onclick = () => {
+                rec.start();
+                micLabel.textContent = "Ouvindo…";
+                btnMic.classList.add('active');
+            };
+            rec.onresult = (e) => {
+                inputArea.value += e.results[0][0].transcript + ' ';
+                micLabel.textContent = "Microfone";
+                btnMic.classList.remove('active');
+            };
+            rec.onerror = () => {
+                micLabel.textContent = "Microfone";
+                btnMic.classList.remove('active');
+            };
+        } else {
+            btnMic.style.display = 'none';
+        }
+
+        // --- SISTEMA GEMINI ---
+        async function fetchGeminiTasks(text) {
+            const systemPrompt = "Você é o motor do FocoLiso, um app para TDAH. Receba o texto do usuário e identifique as tarefas. Quebre tarefas grandes em passos minúsculos de execução. REGRAS DE SAÍDA OBRIGATÓRIAS: 1. Escreva em parágrafos curtos. 2. Máximo de 2 linhas por parágrafo. 3. Use espaçamento duplo entre cada item. 4. Sem listas numeradas, sem emojis, sem palavras de encorajamento. Entregue apenas a informação bruta e formatada.";
+            const payload = {
+                contents: [{ parts: [{ text: `${systemPrompt}\n\nEntrada do usuário: ${text}` }] }]
+            };
+            const response = await fetch(GEMINI_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            return data.candidates[0].content.parts[0].text;
+        }
+
+        btnOrganize.onclick = async () => {
+            const val = inputArea.value.trim();
+            if (!val) return;
+
+            btnOrganize.disabled = true;
+            btnOrganize.innerHTML = 'Processando...';
+
+            try {
+                const result = await fetchGeminiTasks(val);
+                tasks = result.split('\n\n').map(t => t.trim()).filter(t => t.length > 0);
+                currentTaskIndex = 0;
+                renderTask();
+                showScreen('screen-focus');
+            } catch (err) {
+                alert("Erro ao processar. Tente novamente.");
+                console.error(err);
+            } finally {
+                btnOrganize.disabled = false;
+                btnOrganize.textContent = 'Organizar meu Foco';
+            }
+        };
+
+        function renderTask() {
+            if (currentTaskIndex < tasks.length) {
+                taskDisplay.textContent = tasks[currentTaskIndex];
+                const pct = Math.round((currentTaskIndex / tasks.length) * 100);
+                progressFill.style.width = pct + '%';
+                taskCounter.textContent = `${currentTaskIndex + 1} de ${tasks.length}`;
+            } else {
+                progressFill.style.width = '100%';
+                setTimeout(() => {
+                    alert("🎯 Foco concluído! Ótimo trabalho.");
+                    inputArea.value = "";
+                    showScreen('screen-entry');
+                }, 400);
+            }
+        }
+
+        // --- SISTEMA DE PAUSA E CHECK ---
+        btnDone.onclick = () => {
+            currentTaskIndex++;
+            renderTask();
+        };
+
+        btnPauseGo.onclick = () => {
+            showScreen('screen-pause');
+            startTimer();
+        };
+
+        btnResume.onclick = () => {
+            clearInterval(timerInterval);
+            showScreen('screen-focus');
+        };
+
+        function startTimer() {
+            timerSeconds = 300; // 5 minutos
+            updateTimerDisplay();
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timerSeconds--;
+                updateTimerDisplay();
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    alert("Pausa finalizada! Voltando ao foco.");
+                    showScreen('screen-focus');
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const m = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+            const s = String(timerSeconds % 60).padStart(2, '0');
+            timerText.textContent = `${m}:${s}`;
+        }
+    </script>
+</body>
+</html>
